@@ -88,7 +88,7 @@ sub clauses {
 sub identifier {    # method or package identifier
     my $self = shift;
 
-    return '\w+ (?: ::\w+ )*';    # words, possibly separated by ::
+    return '[$@%]? \w+ (?: ::\w+ )*';    # words, possibly with twigil and/or separated by ::
 }
 
 sub prefilter {
