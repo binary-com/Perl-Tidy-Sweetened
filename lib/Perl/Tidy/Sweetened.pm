@@ -113,6 +113,7 @@ $plugins->add_filter(
 #    class Foo with Bar, Baz {
 #    class Foo :Bar :Baz extends Frob {
 #    class Foo :Bar :Baz does Frob, Frin {
+#    class Foo :Bar :Baz :isa(Frob) {
 # where all of the extends, with, and colon-prefixed parameters are optional
 $plugins->add_filter(
     Perl::Tidy::Sweetened::Keyword::Block->new(
@@ -120,7 +121,7 @@ $plugins->add_filter(
         marker      => 'CLASS',
         replacement => 'package',
         clauses =>
-          [ '( : \w+ PAREN? ( \s+ : \w+ PAREN?)* (\s+ (extends|isa) \s+ [\w|:]+ (\s+ v?[0-9]\w+)? | \s+ does \w+ (\s* , \s* \w+)*)?)?', '(with(\s+\w+)*)?', '(extends \s+ [\w|:]+)?', '(is(\s+\w+)*)?', ],
+          [ '( : \s* \w+ PAREN? ( \s+ : \s* \w+ PAREN?)* (\s+ (extends|isa) \s+ [\w|:]+ (\s+ v?[0-9]\w+)? | \s+ does \w+ (\s* , \s* \w+)*)?)?', '(with(\s+\w+)*)?', '(extends \s+ [\w|:]+)?', '(is(\s+\w+)*)?', ],
     ) );
 
 # Create a subroutine filter for:
