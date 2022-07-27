@@ -31,7 +31,9 @@ sub replacement { return $_[0]->{replacement} }
 
 sub emit_placeholder {
     my ( $self, $subname, $brace, $clauses ) = @_;
-
+    # remote extra spaces in attribute string
+    print STDERR "$_\n" and $_ =~ s/(^|[^:]):\s+(\w)/$1:$2/mg for $clauses->@*;
+    print STDERR "$_\n" for $clauses->@*;
     # Store the signature and returns() for later use
     my $id = sprintf "%03d", $self->{counter}++;
     $self->{store_clause}->{$id} = $clauses;
@@ -95,7 +97,8 @@ sub prefilter {
     my ( $self, $code ) = @_;
     my $keyword = $self->keyword;
     my $subname = $self->identifier;
-
+    print STDERR "calling \n" if $self->marker eq 'CLASS';
+    #print STDERR "before prefilter:\n $code \n:end\n"# if $self->marker eq 'CLASS';
     $code =~ s{
         ^\s*\K                    # okay to have leading whitespace (preserve)
         $keyword             \s+  # the "func/method" keyword
@@ -114,7 +117,7 @@ sub prefilter {
         }
         $self->emit_placeholder( $+{subname}, $+{brace}, $clauses )
     }egmx;
-
+    #print STDERR "after prefilter:\n $code \n:end\n";# if $self->marker eq 'CLASS';
     return $code;
 }
 
@@ -125,6 +128,7 @@ sub postfilter {
     my $subname     = $self->identifier;
     my @ids;
 
+    #print STDERR "before postfilter:\n $code \n:end\n";# if $self->marker eq 'CLASS';
     # Convert back to method
     $code =~ s{
         ^\s*\K                     # preserve leading whitespace
@@ -148,6 +152,7 @@ sub postfilter {
         $self->emit_csc( $_, $cscp );
     }egx for @ids;
 
+    #print STDERR "after postfilter:\n $code \n:end\n";# if $self->marker eq 'CLASS';
     return $code;
 }
 
