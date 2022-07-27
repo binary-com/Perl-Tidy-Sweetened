@@ -206,4 +206,11 @@ after foo (Str :$bar, Str :$baz?) {
 }
 TIDIED
 
+run_test( <<'RAW', <<'TIDIED', 'object_pad attribute with extra spaces', '',  );
+class Abc : isa(Date);
+RAW
+class Abc :isa(Date);
+TIDIED
+
+
 done_testing;
