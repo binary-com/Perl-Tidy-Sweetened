@@ -49,14 +49,28 @@ $plugins->add_filter(
 
 # Create a subroutine filter for:
 #    method foo (Int $i) returns (Bool) {}
-# where both the parameter list and the returns type are optional
+#    method foo(@\@) :prototype(@\@) :Bar (Baz) ($i %args) {}
+# where all of the parameter list, returns type, signature, and colon-prefixed parameters are optional
 $plugins->add_filter(
     Perl::Tidy::Sweetened::Keyword::Block->new(
         keyword     => 'method',
         marker      => 'METHOD',
         replacement => 'sub',
         clauses =>
-          [ 'PAREN?', '(returns \s* PAREN)?', '(\b(?:is|but|does) \s+ \w+)?' ],
+          [ 'PAREN? ([:\s]+ \w+ PAREN?)* (\s* PAREN)?', '(returns \s* PAREN)?', '(\b(?:is|but|does) \s+ \w+)?' ],
+    ) );
+
+# Create a subroutine filter for:
+#    async sub foo(@\@) :prototype(@\@) :Bar (Baz) ($i %args) {}
+#    async method foo(@\@) :prototype(@\@) :Bar (Baz) ($i %args) {}
+# where all of the parameter list, returns type, signature, and colon-prefixed parameters are optional
+$plugins->add_filter(
+    Perl::Tidy::Sweetened::Keyword::Block->new(
+        keyword     => 'async',
+        marker      => 'ASYNC',
+        replacement => 'sub',
+        clauses =>
+          [ '\w* (\s* PAREN)? ([:\s]+ \w+ PAREN?)* (\s* PAREN)?' ],
     ) );
 
 # Create a subroutine filter for:
@@ -97,14 +111,41 @@ $plugins->add_filter(
 # Create a subroutine filter for:
 #    class Foo extends Bar {
 #    class Foo with Bar, Baz {
-# where both the extends and with are optional
+#    class Foo :Bar :Baz extends Frob {
+#    class Foo :Bar :Baz does Frob, Frin {
+#    class Foo :Bar :Baz :isa(Frob) {
+# where all of the extends, with, and colon-prefixed parameters are optional
 $plugins->add_filter(
     Perl::Tidy::Sweetened::Keyword::Block->new(
         keyword     => 'class',
         marker      => 'CLASS',
         replacement => 'package',
         clauses =>
-          [ '(with(\s+\w+)*)?', '(extends \s+ [\w|:]+)?', '(is(\s+\w+)*)?', ],
+          [ '( : \s* \w+ PAREN? ( \s+ : \s* \w+ PAREN?)* (\s+ (extends|isa) \s+ [\w|:]+ (\s+ v?[0-9]\w+)? | \s+ does \w+ (\s* , \s* \w+)*)?)?', '(with(\s+\w+)*)?', '(extends \s+ [\w|:]+)?', '(is(\s+\w+)*)?', ],
+    ) );
+
+# Create a subroutine filter for:
+#    role Foo :Bar :Baz {
+# where the colon-prefixed parameters is optional
+$plugins->add_filter(
+    Perl::Tidy::Sweetened::Keyword::Block->new(
+        keyword     => 'role',
+        marker      => 'ROLE',
+        replacement => 'sub',
+        clauses =>
+          [ '( : \w+ PAREN? ( \s+ : \w+ PAREN?)* )?', ],
+    ) );
+
+# Create a subroutine filter for:
+#    has $slot_name :Bar Baz {
+# where the colon-prefixed parameters are optional
+$plugins->add_filter(
+    Perl::Tidy::Sweetened::Keyword::Block->new(
+        keyword     => 'has',
+        marker      => 'HAS',
+        replacement => 'my',
+        clauses =>
+          [ '( : \w+ PAREN? ( \s+ : \w+ PAREN?)* )?', ],
     ) );
 
 # Create a twigil filter for:

@@ -31,7 +31,8 @@ sub replacement { return $_[0]->{replacement} }
 
 sub emit_placeholder {
     my ( $self, $subname, $brace, $clauses ) = @_;
-
+    # remote extra spaces in attribute string
+    $_ =~ s/(^|[^:]):\s+(\w)/$1:$2/mg for $clauses->@*;
     # Store the signature and returns() for later use
     my $id = sprintf "%03d", $self->{counter}++;
     $self->{store_clause}->{$id} = $clauses;
@@ -88,14 +89,13 @@ sub clauses {
 sub identifier {    # method or package identifier
     my $self = shift;
 
-    return '\w+ (?: ::\w+ )*';    # words, possibly separated by ::
+    return '[$@%]? \w+ (?: ::\w+ )*';    # words, possibly with twigil and/or separated by ::
 }
 
 sub prefilter {
     my ( $self, $code ) = @_;
     my $keyword = $self->keyword;
     my $subname = $self->identifier;
-
     $code =~ s{
         ^\s*\K                    # okay to have leading whitespace (preserve)
         $keyword             \s+  # the "func/method" keyword
@@ -114,7 +114,6 @@ sub prefilter {
         }
         $self->emit_placeholder( $+{subname}, $+{brace}, $clauses )
     }egmx;
-
     return $code;
 }
 

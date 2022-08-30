@@ -163,10 +163,10 @@ method name1 :Attrib(Arg) {# comment
 sub name2 :Attrib(Arg) {  # comment
 }
 RAW
-method name1 : Attrib(Arg) {    # comment
+method name1 :Attrib(Arg) {    # comment
 }
 
-sub name2 : Attrib(Arg) {$indent_tc# comment
+sub name2 : Attrib(Arg) {    # comment
 }
 TIDIED
 
@@ -205,5 +205,12 @@ after foo (Str :$bar, Str :$baz?) {
     say "hi";
 }
 TIDIED
+
+run_test( <<'RAW', <<'TIDIED', 'object_pad attribute with extra spaces', '',  );
+class Abc : isa(Date);
+RAW
+class Abc :isa(Date);
+TIDIED
+
 
 done_testing;
