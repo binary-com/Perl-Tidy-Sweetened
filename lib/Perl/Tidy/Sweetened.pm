@@ -148,6 +148,19 @@ $plugins->add_filter(
           [ '( : \w+ PAREN? ( \s+ : \w+ PAREN?)* )?', ],
     ) );
 
+# Create a subroutine filter for:
+#    field $slot_name :Bar Baz {
+# where the colon-prefixed parameters are optional
+$plugins->add_filter(
+    Perl::Tidy::Sweetened::Keyword::Block->new(
+        keyword     => 'field',
+        marker      => 'FIELD',
+        replacement => 'my',
+        clauses =>
+          [ '( : \w+ PAREN? ( \s+ : \w+ PAREN?)* )?', ],
+    ) );
+
+
 # Create a twigil filter for:
 #    $!variable_name
 $plugins->add_filter(
